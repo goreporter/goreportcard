@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Go Report Card | Go project code quality report cards</title>
+    <title>GoReporter | Go project code quality report cards</title>
     <link rel="stylesheet" href="/assets/bulma.0.0.23.min.css">
     <link rel="stylesheet" href="/assets/goreportcard.css">
     <script>
@@ -26,7 +26,7 @@
         <!-- Left side -->
         <div class="header-left">
           <a class="header-item" href="/">
-            <h3 class="title">Go Report Card</h3>
+            <h3 class="title">GoReporter</h3>
           </a>
         </div>
 
@@ -43,7 +43,7 @@
             <a href="/high_scores">High Scores</a>
           </span>
           <span class="header-item">
-            <a href="https://github.com/gojp/goreportcard">GitHub</a>
+            <a href="https://github.com/wgliang/goreporter">GitHub</a>
           </span>
           <span class="header-item">
             <a href="/about">About</a>
@@ -60,11 +60,18 @@
         <form method="POST" action="/checks" id="check_form">
           <div>
             <p class="url">
-              <input name="repo" type="text" class="input-box" placeholder="github.com/gojp/goreportcard"/>
+              <input name="repo" type="text" class="input-box" placeholder="github.com/wgliang/goreporter"/>
             </p>
           </div>
           <div>
-            <button type="submit" class="button btn-test is-large" href="#" role="button">Generate Report</button>
+            <label><input checked="true" name="mode" type="radio" value="" />Dowload</label>
+            <label><input name="mode" type="radio" value="" />Online</label> 
+          </div>
+          <div>
+            <button type="submit" class="button btn-test is-large" href="#" role="button">Go Go Go!</button>
+          </div>
+          <div>
+            
           </div>
         </form>
       </div>
@@ -142,9 +149,8 @@
     <div class="container">
       <div class="content has-text-centered">
         <p>
-            <strong>Go Report Card</strong> by
-              <a href="https://twitter.com/shawnps">Shawn Smith</a> and
-              <a href="https://twitter.com/ironzeb">Herman Schaaf</a>.
+            <strong>GoReporter</strong> by
+              <a href="https://github.com/wgliang">Jack Wang</a>
         </p>
         <p>
             <a href="https://m.do.co/c/cc772879eecd" class="dolink">

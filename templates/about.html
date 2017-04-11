@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Go Report Card | Go project code quality report cards</title>
+    <title>GoReporter | Go project code quality report cards</title>
     <link rel="stylesheet" href="/assets/bulma.0.0.23.min.css">
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -28,7 +28,7 @@
           <!-- Left side -->
           <div class="header-left">
             <a class="header-item" href="/">
-              <h3 class="title">Go Report Card</h3>
+              <h3 class="title">GoReporter</h3>
             </a>
           </div>
 
@@ -56,21 +56,51 @@
     <section class="section">
         <div class="container">
             <h1 class="title">About</h1>
-            <p>Go Report Card was initially developed during <a href="http://gophergala.com/blog/gopher/gala/2015/02/03/winners/">Gopher Gala 2015</a>. It is free, open source and run by volunteers. If you feel like there is something that could be improved, we encourage you to <a href="https://github.com/gojp/goreportcard">open an issue or contribute on GitHub</a>!</p>
-            <p>Note about Digital Ocean referral URL: we are using a referral URL on the "Powered by DigitalOcean" logo in hopes that we may earn some credits to use toward GRC. All referral money will be put toward GRC server costs.</p>
+            <p>A Golang tool that does static analysis, unit testing, code review and generate code quality report. This is a tool that concurrently runs a whole bunch of those linters and normalises their output to a report:</p>
+            <hr>
+            <h3 class="subtitle">Supported linters</h3>
+            <li><a href="https://github.com/wgliang/goreporter/tree/master/linters/unittest">unittest</a> - Golang unit test status.</li>
+            <li><a href="https://github.com/tsenart/deadcode">deadcode</a> - Finds unused code.</li> 
+            <li><a href="https://github.com/alecthomas/gocyclo">gocyclo</a> - Computes the cyclomatic complexity of functions.</li>
+            <li><a href="https://github.com/opennota/check">varcheck</a> - Find unused global variables and constants.</li>
+            <li><a href="https://github.com/opennota/check">structcheck</a> - Find unused struct fields.</li>
+            <li><a href="https://github.com/opennota/check">aligncheck</a> - Warn about un-optimally aligned structures.</li>
+            <li><a href="https://github.com/kisielk/errcheck">errcheck</a> - Check that error return values are used.</li>
+            <li><a href="https://github.com/mibk/dupl">copycode</a> - Reports potentially duplicated code.</li>
+            <li><a href="https://github.com/dominikh/go-tools/tree/master/cmd/gosimple">gosimple</a> - Report simplifications in code.</li>
+            <li><a href="https://github.com/dominikh/go-tools/tree/master/cmd/staticcheck">staticcheck</a> - Statically detect bugs, both obvious and subtle ones.</li>
+            <li><a href="https://github.com/kisielk/godepgraph">godepgraph</a> - Godepgraph is a program for generating a dependency graph of Go packages.</li>
+            <li><a href="https://github.com/client9/misspell">misspell</a> - Correct commonly misspelled English words... quickly.</li>
+            <hr>
+            <h3 class="subtitle">Supported template</h3>
+            <li>- html template file which can be loaded via `-t [file]`.</li>
+            <hr>
+            <h3 class="subtitle">Installing</h3>
+            <p>Requirements</p>
+            <li><a href="https://golang.org/dl">Go</li>
+            <li><a href="http://www.graphviz.org/Download.php">Graphviz</a></li>
+            <p>There are two options for installing goreporter.</p>
+            <p></p>
+            <li>Install a stable version, eg. `go get -u github.com/wgliang/goreporter/tree/version-1.0.0`.
+               I will generally only tag a new stable version when it has passed the Travis regression tests. 
+                 The downside is that the binary will be called `goreporter.version-1.0.0`.</li>
+
+            <li>Install from HEAD with: `go get -u github.com/wgliang/goreporter`.
+               This has the downside that changes to goreporter may break.</li>
             <hr>
             <h3 class="subtitle">Credits</h3>
-            <p>The Go gopher on the home page was designed by <a href="http://reneefrench.blogspot.com/">Renée French</a>.</p>
-            <p>Go Report Card relies on the excellent <a href="https://github.com/alecthomas/gometalinter">Go Meta Linter</a> tool.</p>
+            <li>Templates is designed by liufeifei</li>
+            <li>Logo is designed by <a href="https://github.com/Luxurioust">xuri</a></li>
+            <li>Website is forked from <a href="https://github.com/gojp/goreportcard">gojp</a></li>
+
         </div>
     </section>
     <footer class="footer">
       <div class="container">
         <div class="content has-text-centered">
           <p>
-              <strong>Go Report Card</strong> by
-                <a href="https://twitter.com/shawnps">Shawn Smith</a> and
-                <a href="https://twitter.com/ironzeb">Herman Schaaf</a>.
+              <strong>GoReporter</strong> by
+                <a href="https://github.com/wgliang">Jack Wang</a>
           </p>
           <p>
               <a href="https://m.do.co/c/cc772879eecd" class="dolink">
