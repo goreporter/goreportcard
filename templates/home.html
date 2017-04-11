@@ -40,13 +40,22 @@
         <!-- Right side -->
         <div class="header-right header-menu">
           <span class="header-item">
-            <a href="/high_scores">High Scores</a>
+            <a href="#">HOME</a>
           </span>
           <span class="header-item">
-            <a href="https://github.com/wgliang/goreporter">GitHub</a>
+            <a href="#">FEATURES</a>
           </span>
           <span class="header-item">
-            <a href="/about">About</a>
+            <a href="#">DOCS</a>
+          </span>
+          <span class="header-item">
+            <a href="/high_scores">HIGH SCORES</a>
+          </span>
+          <span class="header-item">
+            <a href="https://github.com/wgliang/goreporter">GITHUB</a>
+          </span>
+          <span class="header-item">
+            <a href="/about">ABOUT</a>
           </span>
         </div>
       </div>
@@ -54,18 +63,16 @@
   <section class="hero is-primary is-medium has-text-centered gopher">
     <div class="hero-content">
       <div class="container">
-        <h2 class="subtitle">
+        <!-- <h2 class="subtitle">
           Enter the <strong>go get</strong> path to the project below:
-        </h2>
+        </h2> -->
         <form method="POST" action="/checks" id="check_form">
           <div>
             <p class="url">
-              <input name="repo" type="text" class="input-box" placeholder="github.com/wgliang/goreporter"/>
+              <h2 class="subtitle">
+          Static analysis, Unit testing and Generate code quality Report for Go project
+        </h2><input name="repo" type="text" class="input-box" placeholder="github.com/wgliang/goreporter"/>
             </p>
-          </div>
-          <div>
-            <label><input checked="true" name="mode" type="radio" value="" />Dowload</label>
-            <label><input name="mode" type="radio" value="" />Online</label> 
           </div>
           <div>
             <button type="submit" class="button btn-test is-large" href="#" role="button">Go Go Go!</button>
@@ -204,7 +211,7 @@
           type: getRequest ? "GET" : "POST",
           url: url,
           data: data,
-          dataType: "json"
+          dataType: "text/html,application/xhtml+xml,application/xml"
       }).fail(function(xhr, status, err){
           alertMessage("There was an error processing your request: " + xhr.responseText);
       }).done(function(data, textStatus, jqXHR){

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/gojp/goreportcard/download"
+	"github.com/goreporter/goreporterweb/download"
 )
 
 const (

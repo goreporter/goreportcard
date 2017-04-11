@@ -10,8 +10,8 @@ import (
 
 	"github.com/boltdb/bolt"
 	humanize "github.com/dustin/go-humanize"
-	"github.com/gojp/goreportcard/check"
-	"github.com/gojp/goreportcard/download"
+	"github.com/goreporter/goreporterweb/check"
+	"github.com/goreporter/goreporterweb/download"
 )
 
 func dirName(repo string) string {
