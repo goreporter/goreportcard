@@ -94,6 +94,7 @@ func main() {
 	http.HandleFunc("/badge/", makeHandler("badge", *dev, handlers.BadgeHandler))
 	http.HandleFunc("/high_scores/", handlers.HighScoresHandler)
 	http.HandleFunc("/about/", handlers.AboutHandler)
+	http.HandleFunc("/features/", handlers.FeaturesHandler)
 	http.HandleFunc("/", handlers.HomeHandler)
 
 	log.Printf("Running on %s ...", *addr)

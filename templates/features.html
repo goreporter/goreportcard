@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>GoReporter | Go project code quality report cards</title>
     <link rel="stylesheet" href="/assets/bulma.0.0.23.min.css">
+    <link rel="stylesheet" href="/assets/custom.css">
+     <link rel="stylesheet" href="/assets/default.css">
     <link rel="stylesheet" href="/assets/goreportcard.css">
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -18,6 +20,7 @@
 
     </script>
 </head>
+
 <body>
   <div id="notifications">
   </div>
@@ -60,78 +63,47 @@
         </div>
       </div>
   </header>
-  <section class="hero is-primary is-medium has-text-centered gopher">
-    <div class="hero-content">
-      <div class="container">
-        <!-- <h2 class="subtitle">
-          Enter the <strong>go get</strong> path to the project below:
-        </h2> -->
-        <form method="POST" action="/checks" id="check_form">
-          <div>
-            <p class="url">
-              <h2 class="subtitle">
-          Static analysis, Unit testing and Generate code quality Report for Go project
-        </h2><input name="repo" type="text" class="input-box" placeholder="github.com/wgliang/goreporter"/>
-            </p>
-          </div>
-          <div>
-            <button type="submit" class="button btn-test is-large" href="#" role="button">Go Go Go!</button>
-          </div>
-          <div>
-            
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
 
-  <section class="section container-suggestions">
-      <div class="container">
-          <div class="columns">
-              <div class="column is-half">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Popular Report Cards</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="table-link"><a href="/report/github.com/golang/crypto">github.com/golang/crypto</a></td>
-                        </tr>
-                        <tr>
-                            <td class="table-link"><a href="/report/github.com/cockroachdb/cockroach">github.com/cockroachdb/cockroach</a></td>
-                        </tr>
-                        <tr>
-                            <td class="table-link"><a href="/report/github.com/gojp/goreportcard">github.com/gojp/goreportcard</a></td>
-                        </tr>
-                        <tr>
-                            <td class="table-link"><a href="/report/github.com/boltdb/bolt">github.com/boltdb/bolt</a></td>
-                        </tr>
-                        <tr>
-                            <td class="table-link"><a href="/report/github.com/docker/docker">github.com/docker/docker</a></td>
-                        </tr>
-                    </tbody>
-                  </table>
+  <section class="section container-features">
+      <div class="features">
+          <div class="features feature-list" style="position: relative; float: left; left: 400px;">
+              <div class="feature-description" style="display: inline-block;">
+                  <h1>Unit Test</h1>
+                  <p style="white-space:normal; width:400px;">Unit test is the most important step for a successful project.So the more high code cover,the more safe.Goreporter calculated and counted the code coverage of the packages and the time-consuming.</p>
               </div>
-              <div class="column is-half">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Recently Generated</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                        [[ range .Recent ]]
-                        <tr>
-                            <td class="table-link"><a href="/report/[[ . ]]">[[ . ]]</td>
-                        </tr>
-                        [[ end ]]
-                    </tbody>
-                  </table>
+              <div class="feature-example" style="display: inline-block; float: right;">
+                  <img style="width: 800px;" src="/assets/pictures/unittest.jpeg"  alt="Unit Test" />
+              </div>
+          </div>
+
+      </div>
+      <div style="height: 250px"></div>
+      <hr>
+      <div class="features">
+          <div class="features feature-list" style="position: relative; float: left; left: 400px;">
+              <div class="feature-example" style="display: inline-block; float: left;">
+                  <img style="width: 800px;" src="/assets/pictures/unittest.jpeg"  alt="Unit Test" />
+              </div>
+              <div class="feature-description" style="display: inline-block;">
+                  <h1>Unit Test</h1>
+                  <p style="white-space:normal; width:400px;">Unit test is the most important step for a successful project.So the more high code cover,the more safe.Goreporter calculated and counted the code coverage of the packages and the time-consuming.</p>
+              </div>
+
+          </div>
+      </div>
+
+      <div class="features">
+          <div class="features feature-list" style="position: relative; float: left; left: 400px;">
+              <div class="feature-description" style="display: inline-block;">
+                  <h1>Unit Test</h1>
+                  <p style="white-space:normal; width:400px;">Unit test is the most important step for a successful project.So the more high code cover,the more safe.Goreporter calculated and counted the code coverage of the packages and the time-consuming.</p>
+              </div>
+              <div class="feature-example" style="display: inline-block; float: right;">
+                  <img style="width: 800px;" src="/assets/pictures/unittest.jpeg"  alt="Unit Test" />
               </div>
           </div>
       </div>
+
   </section>
 
   <section class="section container-results hidden">

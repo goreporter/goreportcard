@@ -4703,7 +4703,7 @@ a.box:active {
 }
 
 .header {
-	background: white;
+	background: #1fc8db;
 	display: -webkit-box;
 	display: -webkit-flex;
 	display: -ms-flexbox;
