@@ -2093,7 +2093,7 @@ table th {
 }
 
 .title {
-	color: #222324;
+	color: white;
 	font-size: 28px;
 	line-height: 1
 }
@@ -4703,7 +4703,7 @@ a.box:active {
 }
 
 .header {
-	background: #1fc8db;
+	background: #262931;
 	display: -webkit-box;
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -4748,7 +4748,7 @@ a.box:active {
 
 @media screen and (min-width: 769px) {
 	.header {
-		height: 50px
+		height: 100px;
 	}
 }
 
@@ -4811,11 +4811,12 @@ a.box:active {
 }
 
 .header-item a,a.header-item {
-	color: #69707a
+	color: white
 }
 
 .header-item a:hover,a.header-item:hover {
-	color: #222324
+	/*color: #222324*/
+	-webkit-tap-highlight-color:#222324
 }
 
 .header-item a.is-active,a.header-item.is-active {
@@ -5195,7 +5196,7 @@ a.box:active {
 }
 
 .hero.is-primary {
-	background: #1fc8db;
+	background: #262931;
 	color: #fff
 }
 

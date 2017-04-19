@@ -6,7 +6,7 @@ import (
 	"text/template"
 )
 
-// AboutHandler handles the about page
+// FeaturesHandler handles the about page
 func FeaturesHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Serving features page")
 
