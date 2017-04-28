@@ -15,7 +15,7 @@ import (
 
 const (
 	// DBPath is the relative (or absolute) path to the bolt database file
-	DBPath string = "goreportcard.db"
+	DBPath string = "goreporterweb.db"
 
 	// RepoBucket is the bucket in which repos will be cached in the bolt DB
 	RepoBucket string = "repos"
