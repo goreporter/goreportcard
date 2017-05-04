@@ -209,7 +209,7 @@
           type: getRequest ? "GET" : "POST",
           url: url,
           data: data,
-          dataType: "text/html,application/xhtml+xml,application/xml"
+          dataType: "json"
       }).fail(function(xhr, status, err){
           alertMessage("There was an error processing your request: " + xhr.responseText);
       }).done(function(data, textStatus, jqXHR){
