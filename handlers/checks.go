@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os/exec"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -92,6 +94,18 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 		return checksResp{}, fmt.Errorf("could not clone repo: %v", err)
 	}
 
+	// go get repo
+	githubIndex := strings.Index(repo, "github.com")
+	if githubIndex < len(repo) {
+		cmd := exec.Command("go", "get", "-u", repo[githubIndex:])
+		err := cmd.Run()
+		if err != nil {
+			return checksResp{}, fmt.Errorf("could not go get repo: %v", err)
+		}
+	} else {
+		return checksResp{}, fmt.Errorf("could not go get repo: %v", err)
+	}
+
 	repo = repoRoot.Root
 
 	dir := dirName(repo)
@@ -140,6 +154,14 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 			ch <- s
 		}(c)
 	}
+
+	go func() {
+		c := check.GoReporter{Dir: dir, Filenames: filenames}
+		err := c.Percentage()
+		if err != nil {
+			log.Printf("ERROR: (%s) %v", c.Name(), err)
+		}
+	}()
 
 	resp := checksResp{
 		Repo:                 repo,
