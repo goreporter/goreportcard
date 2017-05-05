@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"os/exec"
 	"sort"
 	"strings"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	humanize "github.com/dustin/go-humanize"
+	"github.com/golang/glog"
 	"github.com/goreporter/goreporterweb/check"
 	"github.com/goreporter/goreporterweb/download"
 )
@@ -81,7 +81,7 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 		resp, err := getFromCache(repo)
 		if err != nil {
 			// just log the error and continue
-			log.Println(err)
+			glog.Infoln(err)
 		} else {
 			resp.Grade = grade(resp.Average * 100) // grade is not stored for some repos, yet
 			return resp, nil
@@ -119,7 +119,7 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 
 	err = check.RenameFiles(skipped)
 	if err != nil {
-		log.Println("Could not remove files:", err)
+		glog.Infoln("Could not remove files:", err)
 	}
 	defer check.RevertFiles(skipped)
 
@@ -140,7 +140,7 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 			p, summaries, err := c.Percentage()
 			errMsg := ""
 			if err != nil {
-				log.Printf("ERROR: (%s) %v", c.Name(), err)
+				glog.Errorf("ERROR: (%s) %v", c.Name(), err)
 				errMsg = err.Error()
 			}
 			s := score{
@@ -159,7 +159,7 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 		c := check.GoReporter{Dir: dir, Filenames: filenames}
 		err := c.Percentage()
 		if err != nil {
-			log.Printf("ERROR: (%s) %v", c.Name(), err)
+			glog.Errorf("ERROR: (%s) %v", c.Name(), err)
 		}
 	}()
 

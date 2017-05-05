@@ -3,15 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"time"
 
-	"github.com/goreporter/goreporterweb/handlers"
-
 	"github.com/boltdb/bolt"
+	"github.com/golang/glog"
+	"github.com/goreporter/goreporterweb/handlers"
 )
 
 var (
@@ -47,7 +46,7 @@ func makeHandler(name string, dev bool, fn func(http.ResponseWriter, *http.Reque
 		if m2 != nil {
 			// old format is being used
 			repo = "github.com/" + repo
-			log.Printf("Assuming intended repo is %q, redirecting", repo)
+			glog.Infoln("Assuming intended repo is %q, redirecting", repo)
 			http.Redirect(w, r, fmt.Sprintf("/%s/%s", name, repo), http.StatusMovedPermanently)
 			return
 		}
@@ -79,12 +78,12 @@ func initDB() error {
 func main() {
 	flag.Parse()
 	if err := os.MkdirAll("repos/src/github.com", 0755); err != nil && !os.IsExist(err) {
-		log.Fatal("ERROR: could not create repos dir: ", err)
+		glog.Fatal("ERROR: could not create repos dir: ", err)
 	}
 
 	// initialize database
 	if err := initDB(); err != nil {
-		log.Fatal("ERROR: could not open bolt db: ", err)
+		glog.Fatal("ERROR: could not open bolt db: ", err)
 	}
 
 	http.HandleFunc("/assets/", handlers.AssetsHandler)
@@ -97,6 +96,6 @@ func main() {
 	http.HandleFunc("/features/", handlers.FeaturesHandler)
 	http.HandleFunc("/", handlers.HomeHandler)
 
-	log.Printf("Running on %s ...", *addr)
-	log.Fatal(http.ListenAndServe(*addr, nil))
+	glog.Infoln("Running on %s ...", *addr)
+	glog.Fatal(http.ListenAndServe(*addr, nil))
 }

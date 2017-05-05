@@ -4,12 +4,12 @@ import (
 	"container/heap"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/boltdb/bolt"
+	"github.com/golang/glog"
 	"github.com/goreporter/goreporterweb/download"
 )
 
@@ -31,18 +31,18 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 
 	repo, err := download.Clean(r.FormValue("repo"))
 	if err != nil {
-		log.Println("ERROR: from download.Clean:", err)
+		glog.Errorln("ERROR: from download.Clean:", err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`Could not download the repository: ` + err.Error()))
 		return
 	}
 
-	log.Printf("Checking repo %q...", repo)
+	glog.Infof("Checking repo %q...", repo)
 
 	forceRefresh := r.Method != "GET" // if this is a GET request, try to fetch from cached version in boltdb first
 	resp, err := newChecksResp(repo, forceRefresh)
 	if err != nil {
-		log.Println("ERROR: from newChecksResp:", err)
+		glog.Errorln("ERROR: from newChecksResp:", err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`Could not download the repository.`))
 		return
@@ -50,7 +50,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 
 	respBytes, err := json.Marshal(resp)
 	if err != nil {
-		log.Println("ERROR: could not marshal json:", err)
+		glog.Errorln("ERROR: could not marshal json:", err)
 		http.Error(w, err.Error(), 500)
 		return
 	}
@@ -58,7 +58,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	// write to boltdb
 	db, err := bolt.Open(DBPath, 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
-		log.Println("Failed to open bolt database: ", err)
+		glog.Errorln("Failed to open bolt database: ", err)
 		return
 	}
 	defer db.Close()
@@ -75,7 +75,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 	if err != nil {
-		log.Println(err)
+		glog.Errorln(err)
 	}
 
 	// get the old score and store it for stats updating
@@ -84,7 +84,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		oldRepo := checksResp{}
 		err = json.Unmarshal(oldRepoBytes, &oldRepo)
 		if err != nil {
-			log.Println("ERROR: could not unmarshal json:", err)
+			glog.Errorln("ERROR: could not unmarshal json:", err)
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -94,7 +94,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	// if this is a new repo, or the user force-refreshed, update the cache
 	if isNewRepo || forceRefresh {
 		err = db.Update(func(tx *bolt.Tx) error {
-			log.Printf("Saving repo %q to cache...", repo)
+			glog.Errorf("Saving repo %q to cache...", repo)
 
 			b := tx.Bucket([]byte(RepoBucket))
 			if b == nil {
@@ -130,7 +130,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err != nil {
-			log.Println("Bolt writing error:", err)
+			glog.Infoln("Bolt writing error:", err)
 		}
 
 	}
@@ -147,7 +147,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 
 	b, err := json.Marshal(map[string]string{"redirect": "/report/" + repo})
 	if err != nil {
-		log.Println("JSON marshal error:", err)
+		glog.Infoln("JSON marshal error:", err)
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write(b)
@@ -230,7 +230,7 @@ func updateStats(mb *bolt.Bucket, resp checksResp, repo string, oldScore *float6
 }
 
 func updateReposCount(mb *bolt.Bucket, resp checksResp, repo string) (err error) {
-	log.Printf("New repo %q, adding to repo count...", repo)
+	glog.Errorf("New repo %q, adding to repo count...", repo)
 	totalInt := 0
 	total := mb.Get([]byte("total_repos"))
 	if total != nil {
@@ -245,7 +245,7 @@ func updateReposCount(mb *bolt.Bucket, resp checksResp, repo string) (err error)
 		return fmt.Errorf("could not marshal total repos count: %v", err)
 	}
 	mb.Put([]byte("total_repos"), total)
-	log.Println("Repo count is now", totalInt)
+	glog.Infoln("Repo count is now", totalInt)
 	return nil
 }
 

@@ -38,7 +38,7 @@ func main() {
 			if err != nil {
 				return err
 			}
-			log.Printf("%s - %.2f", resp.Repo, resp.Average*100)
+			glog.Errorf("%s - %.2f", resp.Repo, resp.Average*100)
 			stats[int(resp.Average*100)]++
 			return nil
 		})
@@ -53,7 +53,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		log.Printf("Stats: %v", stats)
+		glog.Infof("Stats: %v", stats)
 		err = mb.Put([]byte("stats"), statsBytes)
 		if err != nil {
 			return err
@@ -65,7 +65,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		log.Printf("Stats Confirmation: %v", tStats)
+		glog.Infof("Stats Confirmation: %v", tStats)
 		return nil
 	})
 	if err != nil {

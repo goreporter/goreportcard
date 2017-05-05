@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"flag"
+	"github.com/golang/glog"
 	"html/template"
 )
 
@@ -14,18 +14,18 @@ var googleAnalyticsKey = flag.String("google_analytics_key", "UA-58936835-1", "G
 
 // ReportHandler handles the report page
 func ReportHandler(w http.ResponseWriter, r *http.Request, repo string, dev bool) {
-	log.Printf("Displaying report: %q", repo)
+	glog.Errorf("Displaying report: %q", repo)
 	t := template.Must(template.New("report.html").Delims("[[", "]]").ParseFiles("templates/report.html"))
 	resp, err := getFromCache(repo)
 	needToLoad := false
 	if err != nil {
-		log.Println("ERROR:", err) // log error, but continue
+		glog.Infoln("ERROR:", err) // log error, but continue
 		needToLoad = true
 	}
 
 	respBytes, err := json.Marshal(resp)
 	if err != nil {
-		log.Println("ERROR: marshaling json: ", err)
+		glog.Infoln("ERROR: marshaling json: ", err)
 		http.Error(w, "Failed to load cache object", 500)
 		return
 	}

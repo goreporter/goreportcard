@@ -3,11 +3,12 @@ package check
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/golang/glog"
 )
 
 // GoLint is the check for the go lint command
@@ -34,7 +35,7 @@ func (g GoReporter) Percentage() (err error) {
 	if err != nil {
 		err := os.MkdirAll(reportPath, 0777)
 		if err != nil {
-			log.Println("MkdirAll " + reportPath + " error.")
+			glog.Infoln("MkdirAll " + reportPath + " error.")
 		}
 	}
 	cmd := exec.Command("goreporter", "-p", "."+string(filepath.Separator)+g.Dir, "-r", "."+string(filepath.Separator)+reportPath, "-f", "json")

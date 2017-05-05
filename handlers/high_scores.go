@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/boltdb/bolt"
 	"github.com/dustin/go-humanize"
+	"github.com/golang/glog"
 )
 
 func add(x, y int) int {
@@ -26,7 +26,7 @@ func HighScoresHandler(w http.ResponseWriter, r *http.Request) {
 	// write to boltdb
 	db, err := bolt.Open(DBPath, 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
-		log.Println("Failed to open bolt database: ", err)
+		glog.Infoln("Failed to open bolt database: ", err)
 		return
 	}
 	defer db.Close()
@@ -66,7 +66,7 @@ func HighScoresHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		log.Println("ERROR: Failed to load high scores from bolt database: ", err)
+		glog.Infoln("ERROR: Failed to load high scores from bolt database: ", err)
 		http.Error(w, err.Error(), 500)
 		return
 	}

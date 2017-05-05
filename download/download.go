@@ -2,11 +2,11 @@ package download
 
 import (
 	"errors"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/golang/glog"
 	"golang.org/x/tools/go/vcs"
 )
 
@@ -44,21 +44,21 @@ func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err err
 		return root, err
 	}
 	if ex {
-		log.Println("Update", root.Repo)
+		glog.Infoln("Update", root.Repo)
 		err = root.VCS.Download(fullLocalPath)
 		if err != nil && firstAttempt {
 			// may have been rebased; we delete the directory, then try one more time:
-			log.Printf("Failed to download %q (%v), trying again...", root.Repo, err.Error())
+			glog.Errorf("Failed to download %q (%v), trying again...", root.Repo, err.Error())
 			err = os.RemoveAll(fullLocalPath)
 			if err != nil {
-				log.Println("Failed to delete path:", fullLocalPath, err)
+				glog.Infoln("Failed to delete path:", fullLocalPath, err)
 			}
 			return download(path, dest, false)
 		} else if err != nil {
 			return root, err
 		}
 	} else {
-		log.Println("Create", root.Repo)
+		glog.Infoln("Create", root.Repo)
 
 		err = root.VCS.Create(fullLocalPath, root.Repo)
 		if err != nil {
@@ -68,7 +68,7 @@ func download(path, dest string, firstAttempt bool) (root *vcs.RepoRoot, err err
 	err = root.VCS.TagSync(fullLocalPath, "")
 	if err != nil && firstAttempt {
 		// may have been rebased; we delete the directory, then try one more time:
-		log.Printf("Failed to update %q (%v), trying again...", root.Repo, err.Error())
+		glog.Errorf("Failed to update %q (%v), trying again...", root.Repo, err.Error())
 		err = os.RemoveAll(fullLocalPath)
 		return download(path, dest, false)
 	}

@@ -4,21 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/boltdb/bolt"
+	"github.com/golang/glog"
 )
 
 // HomeHandler handles the homepage
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Serving home page")
+	glog.Infoln("Serving home page")
 
 	if r.URL.Path[1:] == "" {
 		db, err := bolt.Open(DBPath, 0755, &bolt.Options{Timeout: 1 * time.Second})
 		if err != nil {
-			log.Println("Failed to open bolt database: ", err)
+			glog.Infoln("Failed to open bolt database: ", err)
 			return
 		}
 		defer db.Close()

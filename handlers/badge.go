@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
+
+	"github.com/golang/glog"
 )
 
 // Grade represents a grade returned by the server, which is normally
@@ -59,7 +60,7 @@ func BadgeHandler(w http.ResponseWriter, r *http.Request, repo string, dev bool)
 	}
 
 	if err != nil {
-		log.Printf("ERROR: fetching badge for %s: %v", name, err)
+		glog.Errorf("ERROR: fetching badge for %s: %v", name, err)
 		url := "https://img.shields.io/badge/go%20report-error-lightgrey.svg?style=" + style
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 		return
