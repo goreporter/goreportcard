@@ -15,7 +15,14 @@
 }
 #check_form .input-box {
     padding: 0.5em;
-    min-width: 350px;
+    min-width: 375px;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    color: #BBB;
+    text-shadow: 1px 1px #333;
+    border-bottom: dotted #BBB 2px;
 }
 #check_form .btn-test {
     margin-top: 1em;
