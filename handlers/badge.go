@@ -67,5 +67,5 @@ func BadgeHandler(w http.ResponseWriter, r *http.Request, repo string, dev bool)
 	}
 
 	w.Header().Set("Cache-control", "no-store, no-cache, must-revalidate")
-	http.ServeFile(w, r, badgePath(resp.Grade, style, dev))
+	http.ServeFile(w, r, badgePath(grade(float64(resp.Score)), style, dev))
 }

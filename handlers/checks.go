@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
-	"sort"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -14,21 +14,23 @@ import (
 	"github.com/golang/glog"
 	"github.com/goreporter/goreporterweb/check"
 	"github.com/goreporter/goreporterweb/download"
+	"github.com/wgliang/goreporter/engine"
+	"github.com/wgliang/goreporter/tools"
 )
 
 func dirName(repo string) string {
 	return fmt.Sprintf("repos/src/%s", repo)
 }
 
-func getFromCache(repo string) (checksResp, error) {
+func getFromCache(repo string) (tools.HtmlData, error) {
 	// try and fetch from boltdb
 	db, err := bolt.Open(DBPath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
-		return checksResp{}, fmt.Errorf("failed to open bolt database during GET: %v", err)
+		return tools.HtmlData{}, fmt.Errorf("failed to open bolt database during GET: %v", err)
 	}
 	defer db.Close()
 
-	resp := checksResp{}
+	resp := tools.HtmlData{}
 	err = db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(RepoBucket))
 		if b == nil {
@@ -76,14 +78,13 @@ type checksResp struct {
 	HumanizedLastRefresh string    `json:"humanized_last_refresh"`
 }
 
-func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
+func newChecksResp(repo string, forceRefresh bool) (tools.HtmlData, error) {
 	if !forceRefresh {
 		resp, err := getFromCache(repo)
 		if err != nil {
 			// just log the error and continue
 			glog.Infoln(err)
 		} else {
-			resp.Grade = grade(resp.Average * 100) // grade is not stored for some repos, yet
 			return resp, nil
 		}
 	}
@@ -91,7 +92,7 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 	// fetch the repo and grade it
 	repoRoot, err := download.Download(repo, "repos/src")
 	if err != nil {
-		return checksResp{}, fmt.Errorf("could not clone repo: %v", err)
+		return tools.HtmlData{}, fmt.Errorf("could not clone repo: %v", err)
 	}
 
 	// go get repo
@@ -100,10 +101,10 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 		cmd := exec.Command("go", "get", "-u", repo[githubIndex:])
 		err := cmd.Run()
 		if err != nil {
-			return checksResp{}, fmt.Errorf("could not go get repo: %v", err)
+			return tools.HtmlData{}, fmt.Errorf("could not go get repo: %v", err)
 		}
 	} else {
-		return checksResp{}, fmt.Errorf("could not go get repo: %v", err)
+		return tools.HtmlData{}, fmt.Errorf("could not go get repo: %v", err)
 	}
 
 	repo = repoRoot.Root
@@ -111,10 +112,10 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 	dir := dirName(repo)
 	filenames, skipped, err := check.GoFiles(dir)
 	if err != nil {
-		return checksResp{}, fmt.Errorf("could not get filenames: %v", err)
+		return tools.HtmlData{}, fmt.Errorf("could not get filenames: %v", err)
 	}
 	if len(filenames) == 0 {
-		return checksResp{}, fmt.Errorf("no .go files found")
+		return tools.HtmlData{}, fmt.Errorf("no .go files found")
 	}
 
 	err = check.RenameFiles(skipped)
@@ -123,72 +124,17 @@ func newChecksResp(repo string, forceRefresh bool) (checksResp, error) {
 	}
 	defer check.RevertFiles(skipped)
 
-	checks := []check.Check{
-		check.GoFmt{Dir: dir, Filenames: filenames},
-		check.GoVet{Dir: dir, Filenames: filenames},
-		check.GoLint{Dir: dir, Filenames: filenames},
-		check.GoCyclo{Dir: dir, Filenames: filenames},
-		check.License{Dir: dir, Filenames: []string{}},
-		check.Misspell{Dir: dir, Filenames: filenames},
-		check.IneffAssign{Dir: dir, Filenames: filenames},
-		// check.ErrCheck{Dir: dir, Filenames: filenames}, // disable errcheck for now, too slow and not finalized
+	reporter := engine.NewReporter("")
+	reporter.Engine(absSelfPackagePath(repo), "")
+	resp, err := tools.Json2Html(reporter.FormateReport2Json())
+	if err != nil {
+		return tools.HtmlData{}, fmt.Errorf("run goreporter failed:", err)
 	}
-
-	ch := make(chan score)
-	for _, c := range checks {
-		go func(c check.Check) {
-			p, summaries, err := c.Percentage()
-			errMsg := ""
-			if err != nil {
-				glog.Errorf("ERROR: (%s) %v", c.Name(), err)
-				errMsg = err.Error()
-			}
-			s := score{
-				Name:          c.Name(),
-				Description:   c.Description(),
-				FileSummaries: summaries,
-				Weight:        c.Weight(),
-				Percentage:    p,
-				Error:         errMsg,
-			}
-			ch <- s
-		}(c)
-	}
-
-	go func() {
-		c := check.GoReporter{Dir: dir, Filenames: filenames}
-		err := c.Percentage()
-		if err != nil {
-			glog.Errorf("ERROR: (%s) %v", c.Name(), err)
-		}
-	}()
-
-	resp := checksResp{
-		Repo:                 repo,
-		Files:                len(filenames),
-		LastRefresh:          time.Now().UTC(),
-		HumanizedLastRefresh: humanize.Time(time.Now().UTC()),
-	}
-
-	var total, totalWeight float64
-	var issues = make(map[string]bool)
-	for i := 0; i < len(checks); i++ {
-		s := <-ch
-		resp.Checks = append(resp.Checks, s)
-		total += s.Percentage * s.Weight
-		totalWeight += s.Weight
-		for _, fs := range s.FileSummaries {
-			issues[fs.Filename] = true
-		}
-	}
-	total /= totalWeight
-
-	sort.Sort(ByWeight(resp.Checks))
-	resp.Average = total
-	resp.Issues = len(issues)
-	resp.Grade = grade(total * 100)
-
 	return resp, nil
+}
+
+func absSelfPackagePath(repo string) string {
+	return "." + string(filepath.Separator) + "repos" + string(filepath.Separator) + "src" + string(filepath.Separator) + repo
 }
 
 // ByWeight implements sorting for checks by weight descending

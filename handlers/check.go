@@ -11,6 +11,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/golang/glog"
 	"github.com/goreporter/goreporterweb/download"
+	"github.com/wgliang/goreporter/tools"
 )
 
 const (
@@ -154,13 +155,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func updateHighScores(mb *bolt.Bucket, resp checksResp, repo string) error {
-	// check if we need to update the high score list
-	if resp.Files < 100 {
-		// only repos with >= 100 files are considered for the high score list
-		return nil
-	}
-
+func updateHighScores(mb *bolt.Bucket, resp tools.HtmlData, repo string) error {
 	// start updating high score list
 	scoreBytes := mb.Get([]byte("scores"))
 	if scoreBytes == nil {
@@ -170,7 +165,7 @@ func updateHighScores(mb *bolt.Bucket, resp checksResp, repo string) error {
 	json.Unmarshal(scoreBytes, scores)
 
 	heap.Init(scores)
-	if len(*scores) > 0 && (*scores)[0].Score > resp.Average*100.0 && len(*scores) == 50 {
+	if len(*scores) > 0 && (*scores)[0].Score > float64(resp.Score) && len(*scores) == 50 {
 		// lowest score on list is higher than this repo's score, so no need to add, unless
 		// we do not have 50 high scores yet
 		return nil
@@ -185,8 +180,8 @@ func updateHighScores(mb *bolt.Bucket, resp checksResp, repo string) error {
 	// now we can safely push it onto the heap
 	heap.Push(scores, scoreItem{
 		Repo:  repo,
-		Score: resp.Average * 100.0,
-		Files: resp.Files,
+		Score: float64(resp.Score),
+		Files: resp.SimpleIssues,
 	})
 	if len(*scores) > 50 {
 		// trim heap if it's grown to over 50
@@ -204,7 +199,7 @@ func updateHighScores(mb *bolt.Bucket, resp checksResp, repo string) error {
 	return nil
 }
 
-func updateStats(mb *bolt.Bucket, resp checksResp, repo string, oldScore *float64) error {
+func updateStats(mb *bolt.Bucket, resp tools.HtmlData, repo string, oldScore *float64) error {
 	scores := make([]int, 101, 101)
 	statsBytes := mb.Get([]byte("stats"))
 	if statsBytes == nil {
@@ -214,7 +209,7 @@ func updateStats(mb *bolt.Bucket, resp checksResp, repo string, oldScore *float6
 	if err != nil {
 		return err
 	}
-	scores[int(resp.Average*100)]++
+	scores[resp.Score]++
 	if oldScore != nil {
 		scores[int(*oldScore*100)]--
 	}
@@ -229,7 +224,7 @@ func updateStats(mb *bolt.Bucket, resp checksResp, repo string, oldScore *float6
 	return nil
 }
 
-func updateReposCount(mb *bolt.Bucket, resp checksResp, repo string) (err error) {
+func updateReposCount(mb *bolt.Bucket, resp tools.HtmlData, repo string) (err error) {
 	glog.Errorf("New repo %q, adding to repo count...", repo)
 	totalInt := 0
 	total := mb.Get([]byte("total_repos"))
