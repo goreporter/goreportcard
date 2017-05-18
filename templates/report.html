@@ -366,15 +366,15 @@
         });
     }
 
-    resData.gotest.res = changeStringToArray(resData.gotest.res);
+    resData.gotest.res    = changeStringToArray(resData.gotest.res);
     resData.gotest.noTest = changeStringToArray(resData.gotest.noTest);
-    resData.gosimple = changeStringToArray(resData.gosimple);
-    resData.deadcode = changeStringToArray(resData.deadcode);
-    resData.copycode = changeStringToArray(resData.copycode);
-    resData.gocyclo = changeStringToArray(resData.gocyclo);
-    PATH_PREFIX = 3,
-        project = resData.project,
-        $(".gr_project").text(resData.project);
+    resData.gosimple      = changeStringToArray(resData.gosimple);
+    resData.deadcode      = changeStringToArray(resData.deadcode);
+    resData.copycode      = changeStringToArray(resData.copycode);
+    resData.gocyclo       = changeStringToArray(resData.gocyclo);
+    PATH_PREFIX           = 3,
+    project               = resData.project,
+    $(".gr_project").text(resData.project);
     $(".gr_score").attr("data-to", resData.score);
     $(".gr_avgcover").attr("data-to", resData.avgcover);
     $(".gr_pkgcover").attr("data-to", resData.pkgcover);
@@ -400,10 +400,10 @@
     gotestResult();
 
     function gotestResult() {
-        var gotest_result = {};
+        var gotest_result   = {};
         gotest_result.xAxis = [];
         gotest_result.cover = [];
-        gotest_result.time = [];
+        gotest_result.time  = [];
 
         resData.gotest.res.forEach(function(item) {
 
@@ -510,9 +510,9 @@
     var c = 0;
     var gr_cyclo_table = "";
     for (var key in resData.gocyclo) {
-        c++;
         var info = resData.gocyclo[key].Info;
         for (var k in info) {
+            c++;
             var v = info[k]
             var label = "";
             if (v.Comp <= 14) {
@@ -526,7 +526,7 @@
             } else if (30 < v.Comp) {
                 label = '<span class="label bg-red">' + v.Comp + '</span>';
             }
-            gr_cyclo_table += '<tr><td>' + c + '</td><td>><a href="http://' + v.Info + '" target="_blank">' + v.Info + '</a></td><td>' + label + '</td></tr>'
+            gr_cyclo_table += '<tr><td>' + c + '</td><td><a href="http://' + v.Info + '" target="_blank">' + v.Info + '</a></td><td>' + label + '</td></tr>'
         }
     }
     $(".gr_cyclo_table").html(gr_cyclo_table);
