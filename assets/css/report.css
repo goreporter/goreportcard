@@ -243,7 +243,7 @@ body,button,input,select,textarea {
 }
 
 .header-item img {
-    max-height: 24px
+    margin-right: 15px;
 }
 
 .header-item .button+.button,.header-item .pagination a+.button,.pagination .header-item a+.button,.header-item .pagination .button+a,.pagination .header-item .button+a,.header-item .pagination a+a,.pagination .header-item a+a {
