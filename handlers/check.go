@@ -16,7 +16,7 @@ import (
 
 const (
 	// DBPath is the relative (or absolute) path to the bolt database file
-	DBPath string = "goreporterweb.db"
+	DBPath string = "goreporter.db"
 
 	// RepoBucket is the bucket in which repos will be cached in the bolt DB
 	RepoBucket string = "repos"
@@ -29,8 +29,26 @@ const (
 // CheckHandler handles the request for checking a repo
 func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	repoPackage := strings.TrimSuffix(r.FormValue("repo"), "/")
 
-	repo, err := download.Clean(r.FormValue("repo"))
+	// formate branch string
+	branch := strings.TrimSuffix(r.FormValue("branch"), "/")
+	branchs := strings.Split(branch, "/")
+	branch = strings.Join(branchs, "/")
+
+	repoPathsList := strings.Split(repoPackage, "/")
+	if len(repoPathsList) > 3 && branch == "" {
+		repoPackage = strings.Join(repoPathsList[0:3], "/")
+		branch = strings.Join(repoPathsList[3:], "/")
+	}
+	checksRespKey := fmt.Sprintf("%s/%s", repoPackage, branch)
+
+	var (
+		repo string
+		err  error
+	)
+
+	repo, err = download.Clean(repoPackage)
 	if err != nil {
 		glog.Errorln("ERROR: from download.Clean:", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -38,12 +56,12 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	glog.Infof("Checking repo %q...", repo)
+	glog.Infof("Checking repo %s/%s", repoPackage, branch)
 
 	forceRefresh := r.Method != "GET" // if this is a GET request, try to fetch from cached version in boltdb first
-	resp, err := newChecksResp(repo, forceRefresh)
+	resp, err := newChecksResp(repo, branch, forceRefresh)
 	if err != nil {
-		glog.Errorln("ERROR: from newChecksResp:", err)
+		glog.Errorln("ERROR: from newChecksResp:", repo, ":", err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`Could not download the repository.`))
 		return
@@ -72,7 +90,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 		if b == nil {
 			return fmt.Errorf("repo bucket not found")
 		}
-		oldRepoBytes = b.Get([]byte(repo))
+		oldRepoBytes = b.Get([]byte(checksRespKey))
 		return nil
 	})
 	if err != nil {
@@ -95,7 +113,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 	// if this is a new repo, or the user force-refreshed, update the cache
 	if isNewRepo || forceRefresh {
 		err = db.Update(func(tx *bolt.Tx) error {
-			glog.Errorf("Saving repo %q to cache...", repo)
+			glog.Errorf("Saving repo %q to cache...", checksRespKey)
 
 			b := tx.Bucket([]byte(RepoBucket))
 			if b == nil {
@@ -103,7 +121,7 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// save repo to cache
-			err = b.Put([]byte(repo), respBytes)
+			err = b.Put([]byte(checksRespKey), respBytes)
 			if err != nil {
 				return err
 			}
@@ -116,18 +134,18 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 
 			// update total repos count
 			if isNewRepo {
-				err = updateReposCount(mb, resp, repo)
+				err = updateReposCount(mb, resp, checksRespKey)
 				if err != nil {
 					return err
 				}
 			}
 
-			err = updateHighScores(mb, resp, repo)
+			err = updateHighScores(mb, resp, checksRespKey)
 			if err != nil {
 				return err
 			}
 
-			return updateStats(mb, resp, repo, oldScore)
+			return updateStats(mb, resp, checksRespKey, oldScore)
 		})
 
 		if err != nil {
@@ -143,10 +161,10 @@ func CheckHandler(w http.ResponseWriter, r *http.Request) {
 			return fmt.Errorf("meta bucket not found")
 		}
 
-		return updateRecentlyViewed(mb, repo)
+		return updateRecentlyViewed(mb, checksRespKey)
 	})
 
-	b, err := json.Marshal(map[string]string{"redirect": "/report/" + repo})
+	b, err := json.Marshal(map[string]string{"redirect": "/report/" + checksRespKey})
 	if err != nil {
 		glog.Infoln("JSON marshal error:", err)
 	}
@@ -179,9 +197,10 @@ func updateHighScores(mb *bolt.Bucket, resp tools.HtmlData, repo string) error {
 	}
 	// now we can safely push it onto the heap
 	heap.Push(scores, scoreItem{
-		Repo:  repo,
-		Score: float64(resp.Score),
-		Files: resp.SimpleIssues,
+		Repo:   repo,
+		Score:  float64(resp.Score),
+		Files:  resp.SimpleIssues,
+		Issues: resp.Issues,
 	})
 	if len(*scores) > 50 {
 		// trim heap if it's grown to over 50

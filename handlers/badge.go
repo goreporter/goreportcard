@@ -51,7 +51,17 @@ func badgePath(grade Grade, style string, dev bool) string {
 // BadgeHandler handles fetching the badge images
 func BadgeHandler(w http.ResponseWriter, r *http.Request, repo string, dev bool) {
 	name := fmt.Sprintf("%s", repo)
-	resp, err := newChecksResp(name, false)
+	var (
+		branch string
+	)
+	if strings.HasPrefix(name, "skylar_server_tools_code") {
+		branchIndex := strings.Index(name, "/")
+		if branchIndex >= 0 && branchIndex < len(name) {
+			branch = name[(branchIndex + 1):]
+		}
+		name = "https://hqgit01.intra.legendsec.com/360wangguanban/skylar_server_tools_code"
+	}
+	resp, err := newChecksResp(name, branch, false)
 
 	// See: http://shields.io/#styles
 	style := r.URL.Query().Get("style")

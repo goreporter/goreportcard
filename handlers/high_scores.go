@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -76,7 +77,14 @@ func HighScoresHandler(w http.ResponseWriter, r *http.Request) {
 
 	sortedScores := make([]scoreItem, len(*scores))
 	for i := range sortedScores {
-		sortedScores[len(sortedScores)-i-1] = heap.Pop(scores).(scoreItem)
+		lastItem := heap.Pop(scores).(scoreItem)
+		repoPath := strings.Split(lastItem.Repo, "/")
+		if len(repoPath) > 3 {
+			lastItem.RepoAddr = fmt.Sprintf("%s/tree/%s", strings.Join(repoPath[0:3], "/"), strings.Join(repoPath[3:], "/"))
+		} else {
+			lastItem.RepoAddr = lastItem.Repo
+		}
+		sortedScores[len(sortedScores)-i-1] = lastItem
 	}
 
 	t.Execute(w, map[string]interface{}{

@@ -1,9 +1,11 @@
 package handlers
 
 type scoreItem struct {
-	Repo  string  `json:"repo"`
-	Score float64 `json:"score"`
-	Files int     `json:"files"`
+	Repo     string  `json:"repo"`
+	RepoAddr string  `json:"repoAddr"`
+	Score    float64 `json:"score"`
+	Files    int     `json:"files"`
+	Issues   int     `json:"issues"`
 }
 
 // An scoreHeap is a min-heap of ints.

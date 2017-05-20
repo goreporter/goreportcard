@@ -67,7 +67,7 @@
                 <tr>
                 <th>Rank</th>
                 <th>Project</th>
-                <th>Go Files</th>
+                <th>Issues</th>
                 <th>Score</th>
                 </tr>
               </thead>
@@ -75,8 +75,8 @@
             [[ range $index, $highScore := .HighScores ]]
               <tr>
               <td>[[ add $index 1 ]]</td>
-              <td><a href="https://[[ $highScore.Repo ]]" rel="nofollow">[[ $highScore.Repo ]]</a></td>
-              <td>[[ $highScore.Files ]]</td>
+              <td><a href="https://[[ $highScore.RepoAddr ]]" rel="nofollow">[[ $highScore.Repo ]]</a></td>
+              <td>[[ $highScore.Issues ]]</td>
               <td><a href="/report/[[ $highScore.Repo]]">[[ formatScore $highScore.Score ]]</a></td>
               </tr>
             [[end]]

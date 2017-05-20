@@ -21,7 +21,7 @@ func ReportHandler(w http.ResponseWriter, r *http.Request, repo string, dev bool
 		glog.Infoln("ERROR:", err) // log error, but continue
 		// needToLoad = true
 	}
-
+	resp.Project = repo
 	t.Execute(w, map[string]interface{}{
 		"score":          resp.Score,
 		"avgcover":       resp.TestSummaryCoverAvg,

@@ -78,9 +78,9 @@ type checksResp struct {
 	HumanizedLastRefresh string    `json:"humanized_last_refresh"`
 }
 
-func newChecksResp(repo string, forceRefresh bool) (tools.HtmlData, error) {
+func newChecksResp(repo, branch string, forceRefresh bool) (tools.HtmlData, error) {
 	if !forceRefresh {
-		resp, err := getFromCache(repo)
+		resp, err := getFromCache(fmt.Sprintf("%s/%s", repo, branch))
 		if err != nil {
 			// just log the error and continue
 			glog.Infoln(err)
@@ -90,21 +90,29 @@ func newChecksResp(repo string, forceRefresh bool) (tools.HtmlData, error) {
 	}
 
 	// fetch the repo and grade it
-	repoRoot, err := download.Download(repo, "repos/src")
+	repoRoot, err := download.Download(repo, branch, "repos/src")
 	if err != nil {
 		return tools.HtmlData{}, fmt.Errorf("could not clone repo: %v", err)
 	}
 
 	// go get repo
-	githubIndex := strings.Index(repo, "github.com")
-	if githubIndex < len(repo) {
-		cmd := exec.Command("go", "get", "-u", repo[githubIndex:])
-		err := cmd.Run()
-		if err != nil {
+	if strings.Contains(absSelfPackagePath(repo), "github.com") {
+		githubIndex := strings.Index(repo, "github.com")
+		if githubIndex < len(repo) {
+			cmd := exec.Command("go", "get", "-u", repo[githubIndex:])
+			err := cmd.Run()
+			if err != nil {
+				glog.Warningln("Could not go get -u repo:", repo[githubIndex:])
+				cmd = exec.Command("go", "get", repo[githubIndex:])
+				err = cmd.Run()
+				if err != nil {
+					glog.Warningln("Could not go get repo:", repo[githubIndex:])
+					return tools.HtmlData{}, fmt.Errorf("could not go get repo: %v", err)
+				}
+			}
+		} else {
 			return tools.HtmlData{}, fmt.Errorf("could not go get repo: %v", err)
 		}
-	} else {
-		return tools.HtmlData{}, fmt.Errorf("could not go get repo: %v", err)
 	}
 
 	repo = repoRoot.Root
@@ -125,7 +133,9 @@ func newChecksResp(repo string, forceRefresh bool) (tools.HtmlData, error) {
 	defer check.RevertFiles(skipped)
 
 	reporter := engine.NewReporter("")
+	fmt.Println("=============", absSelfPackagePath(repo))
 	reporter.Engine(absSelfPackagePath(repo), "")
+
 	resp, err := tools.Json2Html(reporter.FormateReport2Json())
 	if err != nil {
 		return tools.HtmlData{}, fmt.Errorf("run goreporter failed:", err)
