@@ -468,19 +468,17 @@
     var gr_copied_code_table = "";
     if (resData.copycode.length > 0) {
         for (var key in resData.copycode) {
-            for (var k in resData.copycode[key]) {
-                c++;
-                var v = resData.copycode[key]
-                var files = v.Files
-                var suffixURL = v.Path[0].replace(prefixURL, "");
-                var URL = prefixURL+"blob/"+branch+"/"+suffixURL;
-                gr_copied_code_table += '<tr><td rowspan="' + files + '">' + c + '</td><td rowspan="' + files + '">' + files + '</td><td><a href="http://' + URL + '" target="_blank">' + v.Path[0] + '</a></td></tr>'
-                for (fd in v.Path) {
-                    if (fd != 0) {
-                        var suffixURL = v.Path[fd].replace(prefixURL, "");
-                        var URL = prefixURL+"blob/"+branch+"/"+suffixURL;
-                        gr_copied_code_table += '<tr><td><a href="http://' + URL + '" target="_blank">' + URL + '</a></td></tr>';
-                    }
+            c++;
+            var v = resData.copycode[key]
+            var files = v.Files
+            var suffixURL = v.Path[0].replace(prefixURL, "");
+            var URL = prefixURL+"blob/"+branch+"/"+suffixURL;
+            gr_copied_code_table += '<tr><td rowspan="' + files + '">' + c + '</td><td rowspan="' + files + '">' + files + '</td><td><a href="http://' + URL + '" target="_blank">' + v.Path[0] + '</a></td></tr>'
+            for (fd in v.Path) {
+                if (fd != 0) {
+                    var suffixURL = v.Path[fd].replace(prefixURL, "");
+                    var URL = prefixURL+"blob/"+branch+"/"+suffixURL;
+                    gr_copied_code_table += '<tr><td><a href="http://' + URL + '" target="_blank">' + URL + '</a></td></tr>';
                 }
             }
         }
