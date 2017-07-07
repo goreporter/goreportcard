@@ -13,7 +13,8 @@ import (
 
 // HomeHandler handles the homepage
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	glog.Infoln("Serving home page")
+	glog.Infoln("Serving home page start")
+	glog.Infoln(fmt.Sprintf("%s %s:%s,%s", r.RemoteAddr, r.Method, r.URL, r.Form))
 
 	if r.URL.Path[1:] == "" {
 		db, err := bolt.Open(DBPath, 0755, &bolt.Options{Timeout: 1 * time.Second})

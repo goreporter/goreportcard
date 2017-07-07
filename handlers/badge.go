@@ -50,6 +50,8 @@ func badgePath(grade Grade, style string, dev bool) string {
 
 // BadgeHandler handles fetching the badge images
 func BadgeHandler(w http.ResponseWriter, r *http.Request, repo string, dev bool) {
+	glog.Infoln(fmt.Sprintf("%s %s:%s,%s", r.RemoteAddr, r.Method, r.URL, r.Form))
+
 	name := fmt.Sprintf("%s", repo)
 	var (
 		branch string

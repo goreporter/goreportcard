@@ -133,7 +133,6 @@ func newChecksResp(repo, branch string, forceRefresh bool) (tools.HtmlData, erro
 	defer check.RevertFiles(skipped)
 
 	reporter := engine.NewReporter("")
-	fmt.Println("=============", absSelfPackagePath(repo))
 	reporter.Engine(absSelfPackagePath(repo), "")
 
 	resp, err := tools.Json2Html(reporter.FormateReport2Json())

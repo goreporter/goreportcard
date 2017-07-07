@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"flag"
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -14,6 +15,7 @@ var googleAnalyticsKey = flag.String("google_analytics_key", "", "Google Analyti
 // ReportHandler handles the report page
 func ReportHandler(w http.ResponseWriter, r *http.Request, repo string, dev bool) {
 	glog.Errorf("Displaying report: %q", repo)
+	glog.Infoln(fmt.Sprintf("%s %s:%s,%s", r.RemoteAddr, r.Method, r.URL, r.Form))
 	t := template.Must(template.New("report.html").Delims("[[", "]]").ParseFiles("templates/report.html"))
 	resp, err := getFromCache(repo)
 	// needToLoad := false

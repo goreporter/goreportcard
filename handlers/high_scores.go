@@ -24,6 +24,7 @@ func formatScore(x float64) string {
 
 // HighScoresHandler handles the stats page
 func HighScoresHandler(w http.ResponseWriter, r *http.Request) {
+	glog.Infoln(fmt.Sprintf("%s %s:%s,%s", r.RemoteAddr, r.Method, r.URL, r.Form))
 	// write to boltdb
 	db, err := bolt.Open(DBPath, 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
