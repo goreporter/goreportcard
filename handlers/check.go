@@ -28,6 +28,7 @@ const (
 
 // CheckHandler handles the request for checking a repo
 func CheckHandler(w http.ResponseWriter, r *http.Request) {
+	glog.Infoln(fmt.Sprintf("%s %s:%s,%s", r.RemoteAddr, r.Method, r.URL, r.Form))
 	w.Header().Set("Content-Type", "application/json")
 	repoPackage := strings.TrimSuffix(r.FormValue("repo"), "/")
 
