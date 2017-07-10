@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"time"
 
 	"github.com/boltdb/bolt"
 	"github.com/golang/glog"
 	"github.com/goreporter/goreporterweb/handlers"
+	"github.com/goreporter/goreporterweb/static"
 )
 
 var (
@@ -75,6 +77,21 @@ func initDB() error {
 	return err
 }
 
+func initStatic() {
+	dirs := []string{"templates", "assets"}
+	isSuccess := true
+	for _, dir := range dirs {
+		if err := static.RestoreAssets("./", dir); err != nil {
+			isSuccess = false
+			break
+		}
+	}
+	if !isSuccess {
+		for _, dir := range dirs {
+			os.RemoveAll(filepath.Join("./", dir))
+		}
+	}
+}
 func main() {
 	flag.Parse()
 	if err := os.MkdirAll("repos/src/github.com", 0755); err != nil && !os.IsExist(err) {
@@ -85,6 +102,9 @@ func main() {
 	if err := initDB(); err != nil {
 		glog.Fatal("ERROR: could not open bolt db: ", err)
 	}
+
+	// initialize static source
+	initStatic()
 
 	http.HandleFunc("/assets/", handlers.AssetsHandler)
 	http.HandleFunc("/favicon.ico", handlers.FaviconHandler)
