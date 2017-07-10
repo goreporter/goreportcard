@@ -455,7 +455,7 @@
                 c++;
                 var v = resData.gosimple_result.data_dic[key][k]
                 var suffixURL = v.Path.replace(prefixURL, "");
-                var URL = prefixURL+"blob/"+branch+"/"+suffixURL;
+                var URL = prefixURL+branch+"/"+suffixURL;
                 gr_simple_table += '<tr><td>' + c + '</td><td><a href="http://' + URL + '" target="_blank">' + URL + '</a></td><td>' + v.Info + '</td></tr>'
             }
         }
@@ -472,12 +472,12 @@
             var v = resData.copycode[key]
             var files = v.Files
             var suffixURL = v.Path[0].replace(prefixURL, "");
-            var URL = prefixURL+"blob/"+branch+"/"+suffixURL;
+            var URL = prefixURL+branch+"/"+suffixURL;
             gr_copied_code_table += '<tr><td rowspan="' + files + '">' + c + '</td><td rowspan="' + files + '">' + files + '</td><td><a href="http://' + URL + '" target="_blank">' + v.Path[0] + '</a></td></tr>'
             for (fd in v.Path) {
                 if (fd != 0) {
                     var suffixURL = v.Path[fd].replace(prefixURL, "");
-                    var URL = prefixURL+"blob/"+branch+"/"+suffixURL;
+                    var URL = prefixURL+branch+"/"+suffixURL;
                     gr_copied_code_table += '<tr><td><a href="http://' + URL + '" target="_blank">' + URL + '</a></td></tr>';
                 }
             }
@@ -508,7 +508,7 @@
             c++;
             var v = resData.deadcode[key];
             var suffixURL = v.Path.replace(prefixURL, "");
-            var URL = prefixURL+"blob/"+branch+"/"+suffixURL;
+            var URL = prefixURL+branch+"/"+suffixURL;
             gr_deadcode += '<tr><td>' + c + '</td><td><a href="http://' + URL + '" target="_blank">' + URL + '</a></td><td>' + v.Info + '</td></tr>'
         }
         $(".gr_deadcode").html(gr_deadcode);
@@ -536,7 +536,7 @@
                 label = '<span class="label bg-red">' + v.Comp + '</span>';
             }
             var suffixURL = v.Info.replace(prefixURL, "");
-            var URL = prefixURL+"blob/"+branch+"/"+suffixURL;
+            var URL = prefixURL+branch+"/"+suffixURL;
             gr_cyclo_table += '<tr><td>' + c + '</td><td><a href="http://' + URL + '" target="_blank">' + URL + '</a></td><td>' + label + '</td></tr>'
         }
     }
